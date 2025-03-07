@@ -114,6 +114,12 @@ const UnsplashGallery: React.FC = () => {
 				</button>
 			</form>
 
+			<h2 className='text-2xl py-3'>
+				{" "}
+				showing results for{" "}
+				<span className='font-bold font-serif underline'>{query}</span>
+			</h2>
+
 			{/* Loading & Error */}
 			{isFetching && !isFetchingNextPage && (
 				<p className='text-center py-4'>Loading...</p>

@@ -9,7 +9,7 @@ export default function Page() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<div className='min-h-screen bg-gray-100'>
+			<div className='min-h-screen text-black bg-gray-100'>
 				<UnsplashGallery />
 			</div>
 		</QueryClientProvider>

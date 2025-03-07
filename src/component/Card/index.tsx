@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
@@ -34,7 +34,6 @@ const fetchImages = async ({
 
 	const data = await res.json();
 
-	// Map results to ensure a consistent structure
 	return query
 		? data.results.map(
 				(img: {
@@ -44,7 +43,7 @@ const fetchImages = async ({
 					likes: number;
 				}) => ({
 					id: img.id,
-					imageUrl: img.urls?.small || "",
+					imageUrl: img.urls.small || "",
 					authorName: img.user?.name || "Unknown",
 					authorImage: img.user?.profile_image?.medium || "",
 					likeCount: img.likes || 0,
@@ -58,7 +57,7 @@ const fetchImages = async ({
 					likes: number;
 				}) => ({
 					id: img.id,
-					imageUrl: img.urls?.small || "",
+					imageUrl: img.urls.small || "",
 					authorName: img.user?.name || "Unknown",
 					authorImage: img.user?.profile_image?.medium || "",
 					likeCount: img.likes || 0,
@@ -68,6 +67,7 @@ const fetchImages = async ({
 
 const UnsplashGallery: React.FC = () => {
 	const [query, setQuery] = useState<string>("");
+	const [debouncedQuery, setDebouncedQuery] = useState<string>("");
 
 	const {
 		data,
@@ -77,18 +77,30 @@ const UnsplashGallery: React.FC = () => {
 		isFetching,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ["images", query],
-		queryFn: fetchImages,
-		getNextPageParam: (_: unknown, allPages: UnsplashImage[][]) =>
-			allPages.length + 1, // Increment page number
+		queryKey: ["images", debouncedQuery],
+		queryFn: async ({ queryKey, pageParam }) => {
+			return await fetchImages({ queryKey, pageParam });
+		},
+		getNextPageParam: (_lastPage, allPages) => allPages.length + 1,
 		initialPageParam: 1,
+		enabled: true,
 	});
 
 	const images = data?.pages.flat() || [];
 
+	// Debounce logic
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedQuery(query);
+		}, 2000);
+
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [query]);
+
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault();
-		setQuery(query);
 	};
 
 	return (
@@ -115,9 +127,10 @@ const UnsplashGallery: React.FC = () => {
 			</form>
 
 			<h2 className='text-2xl py-3'>
-				{" "}
-				showing results for{" "}
-				<span className='font-bold font-serif underline'>{query}</span>
+				Showing results for{" "}
+				<span className='font-bold font-serif underline'>
+					{debouncedQuery || "default"}
+				</span>
 			</h2>
 
 			{/* Loading & Error */}
@@ -187,7 +200,7 @@ const UnsplashGallery: React.FC = () => {
 			)}
 
 			<div className='text-center mt-8 text-gray-500'>
-				Made with ❤️ and caprisun by{" "}
+				Made with ❤️ by{" "}
 				<a href='https://github.com/Franklin-tech01'>Franklin</a>
 			</div>
 		</div>

@@ -94,7 +94,7 @@ const UnsplashGallery: React.FC = () => {
 	return (
 		<div className='w-full xl:w-[1200px] mx-auto p-6 bg-gray-100'>
 			<div className='flex justify-between my-20 items-center'>
-				<p className='font-bold text-4xl'>Photo Search</p>
+				<h1 className='font-bold text-4xl'>Photo Search</h1>
 				<p>{new Date().toLocaleDateString()}</p>
 			</div>
 
@@ -170,7 +170,7 @@ const UnsplashGallery: React.FC = () => {
 					<button
 						onClick={() => fetchNextPage()}
 						disabled={isFetchingNextPage}
-						className={`px-4 py-2 rounded-md ${
+						className={`px-4 cursor-pointer py-2 rounded-md ${
 							isFetchingNextPage
 								? "bg-gray-300 cursor-not-allowed"
 								: "bg-blue-500 text-white hover:bg-blue-600"
